@@ -22,14 +22,6 @@
                 {
                     "name": "challenge3",
                     "type": "bool"
-                },
-                {
-                    "name": "game_entries",
-                    "type": "uint32"
-                },
-                {
-                    "name": "entries_used",
-                    "type": "uint32"
                 }
             ]
         },
