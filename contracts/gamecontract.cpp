@@ -112,3 +112,14 @@ void gamecontract::on_transfer(name from, name to, asset quantity, std::string m
 
     print("Fee received: ", quantity, " (", prize_amount, " added to prize pool) from user: ", from);
 }
+
+void gamecontract::removegame(name user) {
+    require_auth(get_self());  // Only contract account can remove games
+
+    game_table games(get_self(), get_self().value);
+    auto itr = games.find(user.value);
+    check(itr != games.end(), "Game not found for user.");
+
+    games.erase(itr);
+    print("Game removed for user: ", user);
+}

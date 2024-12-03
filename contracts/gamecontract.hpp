@@ -29,6 +29,9 @@ public:
     [[eosio::on_notify("eosio.token::transfer")]]
     void on_transfer(name from, name to, asset quantity, std::string memo);
 
+    [[eosio::action]]
+    void removegame(name user);
+
 private:
     // Constants
     const asset MIN_FEE = asset(100000000, symbol("WAX", 8));  // 1.00000000 WAX
