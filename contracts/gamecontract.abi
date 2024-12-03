@@ -26,10 +26,6 @@
                 {
                     "name": "game_entries",
                     "type": "uint32"
-                },
-                {
-                    "name": "entries_used",
-                    "type": "uint32"
                 }
             ]
         },
@@ -92,6 +88,20 @@
             ]
         },
         {
+            "name": "useentry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "entry_amount",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "validateqfee",
             "base": "",
             "fields": [
@@ -125,6 +135,11 @@
         {
             "name": "updchallenge",
             "type": "updchallenge",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "useentry",
+            "type": "useentry",
             "ricardian_contract": ""
         },
         {
