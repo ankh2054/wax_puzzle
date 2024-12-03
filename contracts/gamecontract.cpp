@@ -12,7 +12,7 @@ void gamecontract::validateqfee(name user, asset fee) {
 
 // Start a new game
 void gamecontract::startgame(name user) {
-    require_auth(user);
+    require_auth(get_self());
 
     game_table games(get_self(), get_self().value);
     auto itr = games.find(user.value);
