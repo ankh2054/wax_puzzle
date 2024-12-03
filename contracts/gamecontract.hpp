@@ -32,6 +32,9 @@ public:
     [[eosio::action]]
     void removegame(name user);
 
+    [[eosio::action]]
+    void useentry(name user, uint32_t entry_amount);
+
 private:
     // Constants
     const asset MIN_FEE = asset(100000000, symbol("WAX", 8));  // 1.00000000 WAX
@@ -42,8 +45,7 @@ private:
         bool challenge1;    // Challenge 1 status
         bool challenge2;    // Challenge 2 status
         bool challenge3;    // Challenge 3 status
-        uint32_t game_entries;  // Number of paid entries
-        uint32_t entries_used;  // Number of entries used
+        uint32_t game_entries;  // Number of available entries (increases with payment, decreases with use)
 
         uint64_t primary_key() const { return user.value; }
     };

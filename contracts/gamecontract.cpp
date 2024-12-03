@@ -16,7 +16,7 @@ void gamecontract::startgame(name user) {
 
     game_table games(get_self(), get_self().value);
     auto itr = games.find(user.value);
-    check(itr == games.end(), "User already has an active game. Finish it before starting a new one.");
+    check(itr == games.end(), "User already has a game record. Cannot start a new game.");
 
     games.emplace(get_self(), [&](auto& row) {
         row.user = user;
@@ -24,7 +24,6 @@ void gamecontract::startgame(name user) {
         row.challenge2 = false;
         row.challenge3 = false;
         row.game_entries = 0;
-        row.entries_used = 0;
     });
 
     print("Game started for user: ", user);
@@ -127,7 +126,6 @@ void gamecontract::on_transfer(name from, name to, asset quantity, std::string m
             row.challenge2 = false;
             row.challenge3 = false;
             row.game_entries = new_entries;
-            row.entries_used = 0;
         });
     } else {
         games.modify(game_itr, get_self(), [&](auto& row) {
@@ -147,4 +145,19 @@ void gamecontract::removegame(name user) {
 
     games.erase(itr);
     print("Game removed for user: ", user);
+}
+
+void gamecontract::useentry(name user, uint32_t entry_amount) {
+    require_auth(get_self());
+
+    game_table games(get_self(), get_self().value);
+    auto itr = games.find(user.value);
+    check(itr != games.end(), "Game not found for user.");
+    check(itr->game_entries >= entry_amount, "Not enough entries available.");
+
+    games.modify(itr, get_self(), [&](auto& row) {
+        row.game_entries -= entry_amount;
+    });
+
+    print("Entries used for user: ", user, " (", entry_amount, " entries deducted, ", itr->game_entries - entry_amount, " remaining)");
 }
