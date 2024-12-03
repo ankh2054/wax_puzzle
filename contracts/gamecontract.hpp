@@ -42,6 +42,8 @@ private:
         bool challenge1;    // Challenge 1 status
         bool challenge2;    // Challenge 2 status
         bool challenge3;    // Challenge 3 status
+        uint32_t game_entries;  // Number of paid entries (increments with each 1 WAX payment)
+        uint32_t entries_used;  // Number of entries used
 
         uint64_t primary_key() const { return user.value; }
     };
