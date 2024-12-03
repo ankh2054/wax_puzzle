@@ -18,8 +18,6 @@ void gamecontract::startgame(name user) {
     auto itr = games.find(user.value);
     check(itr == games.end(), "User already has an active game. Finish it before starting a new one.");
 
-    require_auth(get_self());
-
     games.emplace(get_self(), [&](auto& row) {
         row.user = user;
         row.challenge1 = false;
