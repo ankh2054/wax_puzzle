@@ -1,36 +1,43 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Testing the contract
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+In order for a player to start a game they need to furst pay the minimum fee.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+transfer sentnltestin sentnlagents "0.1000 WAX" "payment memo"
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+#### VAlidate Fee 
 
-To learn more about Next.js, take a look at the following resources:
+   `cleos push action sentnlagents validateqfee '["sentnltestin", "0.1000 WAX"]' -p sentnltestin@active`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### Start a new game
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   `cleos push action sentnlagents startgame '["sentnltestin", "0"]' -p sentnltestin@active`
 
-## Deploy on Vercel
+#### Update challenge
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each time a user solves a challenge, the challenge number is updated with True on the contract tables.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Challange1:
+
+   `cleos push action sentnlagents updchallenge '["sentnltestin", "1"]' -p sentnltestin@active`
+
+Challange2:
+
+   `cleos push action sentnlagents updchallenge '["sentnltestin", "2"]' -p sentnltestin@active`
+
+Challange3:
+
+   `cleos push action sentnlagents updchallenge '["sentnltestin", "3"]' -p sentnltestin@active`
+
+
+#### Claim prize
+
+Once all the challenges are solved, the user can claim the prize.
+
+   `cleos push action sentnlagents claimprize '["sentnltestin"]' -p sentnltestin@active`
+
+

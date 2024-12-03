@@ -31,7 +31,7 @@ public:
 
 private:
     // Constants
-    const asset MIN_FEE = asset(10000, symbol("WAX", 4)); // Minimum per-question fee: 0.1000 WAX
+    const asset MIN_FEE = asset(100000000, symbol("WAX", 8));  // 1.00000000 WAX
 
     // Game table
     struct [[eosio::table]] game {
