@@ -1,17 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Testing the contract
+## Testing the Contract
 
+### Game Flow
+1. User logs in through the frontend
+2. Frontend validates the minimum fee (1.00000000 WAX) using `validateqfee`
+3. User pays the fee via token transfer
+4. User can start the game
+5. For each correct answer, the contract account (not the user) updates the challenge status
 
-In order for a player to start a game they need to furst pay the minimum fee.
+### Test Commands
 
-transfer sentnltestin sentnlagents "0.1000 WAX" "payment memo"
+#### 1. Validate Fee (Frontend Security Check)
 
-
-
-#### VAlidate Fee 
-
-   `cleos push action sentnlagents validateqfee '["sentnltestin", "0.1000 WAX"]' -p sentnltestin@active`
+   `cleos push action sentnlagents validateqfee '["sentnltestin", "1.00000000 WAX"]' -p sentnltestin@active`
 
 #### Start a new game
 
@@ -23,15 +25,15 @@ Each time a user solves a challenge, the challenge number is updated with True o
 
 Challange1:
 
-   `cleos push action sentnlagents updchallenge '["sentnltestin", "1"]' -p sentnltestin@active`
+   `cleos push action sentnlagents updchallenge '["sentnltestin", "1"]' -p sentnlagents@active`
 
 Challange2:
 
-   `cleos push action sentnlagents updchallenge '["sentnltestin", "2"]' -p sentnltestin@active`
+   `cleos push action sentnlagents updchallenge '["sentnltestin", "2"]' -p sentnlagents@active`
 
 Challange3:
 
-   `cleos push action sentnlagents updchallenge '["sentnltestin", "3"]' -p sentnltestin@active`
+   `cleos push action sentnlagents updchallenge '["sentnltestin", "3"]' -p sentnlagents@active`
 
 
 #### Claim prize

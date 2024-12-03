@@ -69,6 +69,7 @@ void gamecontract::transfer(name user) {
     check(pool_itr != pool.end(), "Prize pool not found.");
     check(pool_itr->amount.amount > 0, "Prize pool is empty.");
 
+    // Transfer the available prize amount
     action(
         permission_level{get_self(), "active"_n},
         "eosio.token"_n,
@@ -76,13 +77,14 @@ void gamecontract::transfer(name user) {
         std::make_tuple(get_self(), user, pool_itr->amount, std::string("Congratulations on winning!"))
     ).send();
 
+    // Reset prize pool after transfer
     pool.modify(pool_itr, get_self(), [&](auto& row) {
         row.amount = asset(0, MIN_FEE.symbol);
     });
 
     games.erase(itr);
 
-    print("Prize transferred to user: ", user);
+    print("Prize of ", pool_itr->amount, " transferred to user: ", user);
 }
 
 // Handle fee transfers
@@ -92,18 +94,21 @@ void gamecontract::on_transfer(name from, name to, asset quantity, std::string m
     check(quantity >= MIN_FEE, "Transfer does not meet the minimum fee requirement.");
     check(quantity.symbol == MIN_FEE.symbol, "Transfer must be in WAX.");
 
+    // Calculate 70% for prize pool
+    asset prize_amount = asset(quantity.amount * 70 / 100, quantity.symbol);
+
     prize_pool_table pool(get_self(), get_self().value);
     auto pool_itr = pool.find(0);
     if (pool_itr == pool.end()) {
         pool.emplace(get_self(), [&](auto& row) {
             row.id = 0;
-            row.amount = quantity;
+            row.amount = prize_amount;
         });
     } else {
         pool.modify(pool_itr, get_self(), [&](auto& row) {
-            row.amount += quantity;
+            row.amount += prize_amount;
         });
     }
 
-    print("Fee received: ", quantity, " from user: ", from);
+    print("Fee received: ", quantity, " (", prize_amount, " added to prize pool) from user: ", from);
 }
