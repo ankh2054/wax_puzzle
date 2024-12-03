@@ -23,6 +23,8 @@ void gamecontract::startgame(name user) {
         row.challenge1 = false;
         row.challenge2 = false;
         row.challenge3 = false;
+        row.game_entries = 0;
+        row.entries_used = 0;
     });
 
     print("Game started for user: ", user);
@@ -94,9 +96,13 @@ void gamecontract::on_transfer(name from, name to, asset quantity, std::string m
     check(quantity >= MIN_FEE, "Transfer does not meet the minimum fee requirement.");
     check(quantity.symbol == MIN_FEE.symbol, "Transfer must be in WAX.");
 
+    // Calculate entries (1 WAX = 1 entry)
+    uint32_t new_entries = quantity.amount / MIN_FEE.amount;
+    
     // Calculate 70% for prize pool
     asset prize_amount = asset(quantity.amount * 70 / 100, quantity.symbol);
 
+    // Update prize pool
     prize_pool_table pool(get_self(), get_self().value);
     auto pool_itr = pool.find(0);
     if (pool_itr == pool.end()) {
@@ -110,7 +116,26 @@ void gamecontract::on_transfer(name from, name to, asset quantity, std::string m
         });
     }
 
-    print("Fee received: ", quantity, " (", prize_amount, " added to prize pool) from user: ", from);
+    // Update or create game entry
+    game_table games(get_self(), get_self().value);
+    auto game_itr = games.find(from.value);
+    
+    if (game_itr == games.end()) {
+        games.emplace(get_self(), [&](auto& row) {
+            row.user = from;
+            row.challenge1 = false;
+            row.challenge2 = false;
+            row.challenge3 = false;
+            row.game_entries = new_entries;
+            row.entries_used = 0;
+        });
+    } else {
+        games.modify(game_itr, get_self(), [&](auto& row) {
+            row.game_entries += new_entries;
+        });
+    }
+
+    print("Fee received: ", quantity, " (", prize_amount, " added to prize pool, ", new_entries, " entries added) from user: ", from);
 }
 
 void gamecontract::removegame(name user) {
