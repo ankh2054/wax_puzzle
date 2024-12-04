@@ -41,13 +41,13 @@ Fields:
 - Adds entries (1 WAX = 1 entry)
 - 70% goes to prize pool
 
-   `cleos push action sentnlagents payfee '["sentnltestin", "1.00000000 WAX"]' -p sentnltestin@active`
+   User transfers 1 WAX to the contract account
 
 #### 3. Start a new game
 
 Note: Will fail if user already has a game record
 
-   `cleos push action sentnlagents startgame '["sentnltestin", "0"]' -p sentnltestin@active`
+   `cleos push action sentnlagents startgame '["sentnltestin", "0"]' -p sentnlagents@active`
 
 #### 4. Update challenge
 
@@ -83,15 +83,15 @@ If for any reason a player wants to leave the game, the contract account can rem
 
    `cleos push action sentnlagents removegame '["sentnltestin"]' -p sentnlagents@active`
 
-#### 7. Use entries
+#### 7. Use game entries
 
-The user can use entries to solve challenges.
+The user can use game entries to solve challenges.
 
-   `cleos push action sentnlagents useentry '["sentnltestin", 1]' -p sentnltestin@active`
+   `cleos push action sentnlagents useentry '["sentnltestin", 1]' -p sentnlagents@active`
 
 ### Important Notes
 - Users can't start a new game if they already have a game record
-- Game entries accumulate even without an active game
+- Game entries accumulate with every 1 WAX token send as payment.
 - Only the contract account can update challenge status and remove games
 - Prize pool is shared among all players and cleared when claimed
 

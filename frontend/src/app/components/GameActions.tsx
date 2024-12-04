@@ -1,13 +1,14 @@
 import { useState } from 'react'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_URL = 'https://testnet.waxsweden.org'
+const BACKEND_URL = 'http://localhost:3001'
 
 export default function GameActions({ session }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleAction = async (endpoint: string, data: any) => {
-    if (!session?.auth) {
+    if (!session) {
       setError('Not authenticated')
       return
     }
@@ -15,22 +16,34 @@ export default function GameActions({ session }) {
     setLoading(true)
     setError('')
     try {
+      // Create a dummy action to sign
+      const action = {
+        account: 'sentnlagents',
+        name: 'verify',
+        authorization: [{
+          actor: session.actor,
+          permission: session.permission
+        }],
+        data: {
+          user: session.actor,
+          timestamp: Date.now()
+        }
+      }
+
+      // Sign the action
+      const result = await session.transact({ action })
+      
       const response = await fetch(`${API_URL}/${endpoint}`, {
         method: 'POST',
+        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${session.actor} ${session.auth.signature}`
+          'Authorization': `Bearer ${result.request.encode()}:${result.signatures[0]}`
         },
         body: JSON.stringify(data),
       })
       
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Action failed')
-      }
-      
-      const result = await response.json()
-      return result
+      return response;
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -39,23 +52,104 @@ export default function GameActions({ session }) {
   }
 
   const updateChallenge = async (challengeId: number) => {
-    await handleAction('updateChallenge', {
-      user: session.actor,
-      challengeId
-    })
+    try {
+      const response = await fetch(`${BACKEND_URL}/updateChallenge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': await handleAction('verify', {})
+        },
+        body: JSON.stringify({
+          user: session.actor,
+          challengeId
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
   }
 
   const validateFee = async () => {
-    await handleAction('validateFee', {
-      user: session.actor,
-      fee: '1.0000 WAX'
-    })
+    try {
+      const response = await fetch(`${BACKEND_URL}/validateFee`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': await handleAction('verify', {})
+        },
+        body: JSON.stringify({
+          user: session.actor,
+          fee: '1.0000 WAX'
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
   }
 
   const transfer = async () => {
-    await handleAction('transfer', {
-      user: session.actor
-    })
+    try {
+      const response = await fetch(`${BACKEND_URL}/transfer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': await handleAction('verify', {})
+        },
+        body: JSON.stringify({
+          user: session.actor
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
+  const buyTickets = async () => {
+    if (!session) return;
+    
+    try {
+      setLoading(true);
+      const action = {
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+          actor: session.actor,
+          permission: session.permission
+        }],
+        data: {
+          from: session.actor,
+          to: 'sentnlagents',
+          quantity: '1.00000000 WAX',
+          memo: 'Ticket purchase'
+        }
+      };
+
+      const result = await session.transact({
+        actions: [action]
+      });
+
+      console.log('Transaction complete:', result);
+    } catch (err: any) {
+      console.error('Transaction error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (!session) {
@@ -90,6 +184,13 @@ export default function GameActions({ session }) {
           className="block w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
         >
           Claim Prize
+        </button>
+
+        <button
+          onClick={buyTickets}
+          className="block w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Buy Ticket (1 WAX)
         </button>
       </div>
 

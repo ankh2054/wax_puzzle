@@ -3,9 +3,10 @@
 import WaxLogin from './components/WaxLogin'
 import GameActions from './components/GameActions'
 import { useState } from 'react'
+import { Session } from '@wharfkit/session'
 
 export default function Home() {
-  const [session, setSession] = useState(null)
+  const [session, setSession] = useState<Session | null>(null)
 
   return (
     <main className="min-h-screen p-8">
@@ -20,3 +21,6 @@ export default function Home() {
     </main>
   )
 }
+
+
+

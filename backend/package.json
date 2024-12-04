@@ -4,21 +4,19 @@
   "description": "Backend for WAX Puzzle Game",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn src/index.ts"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "dependencies": {
     "@fastify/cors": "^8.3.0",
     "@wharfkit/session": "^1.0.0",
     "@wharfkit/wallet-plugin-anchor": "^1.0.0",
+    "@wharfkit/wallet-plugin-privatekey": "^1.1.0",
     "@wharfkit/web-renderer": "^1.0.0",
     "dotenv": "^16.4.5",
     "fastify": "^4.24.0"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.2.2"
+    "nodemon": "^3.1.7"
   }
 }
