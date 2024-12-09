@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
+import Modal from './Modal'
 
 const API_URL = 'https://testnet.waxsweden.org'
 const BACKEND_URL = 'http://localhost:3001'
@@ -6,68 +7,98 @@ const BACKEND_URL = 'http://localhost:3001'
 export default function GameActions({ session }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
 
   const handleAction = async (endpoint: string, data: any) => {
     if (!session) {
       setError('Not authenticated')
-      return
+      return null
     }
 
     setLoading(true)
     setError('')
     try {
-      // Create a dummy action to sign
-      const action = {
+      const actions = [{
         account: 'sentnlagents',
-        name: 'verify',
+        name: 'validateqfee',
         authorization: [{
           actor: session.actor,
           permission: session.permission
         }],
         data: {
           user: session.actor,
-          timestamp: Date.now()
+          fee: '10.00000000 WAX'
         }
-      }
+      }]
 
-      // Sign the action
-      const result = await session.transact({ action })
+      const result = await session.transact({ actions })
       
-      const response = await fetch(`${API_URL}/${endpoint}`, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${result.request.encode()}:${result.signatures[0]}`
-        },
-        body: JSON.stringify(data),
-      })
+      // Get transaction ID from response and signature from signatures array
+      const transactionId = result.response?.transaction_id
+      const signature = result.signatures?.[0]
+
+      if (!transactionId || !signature) {
+        console.error('Missing transaction data:', { transactionId, signature })
+        throw new Error('Invalid transaction result')
+      }
       
-      return response;
+      const token = `${transactionId}:${signature}`
+      return token
+
     } catch (err: any) {
+      console.error('Failed to get auth token:', err)
       setError(err.message)
+      return null
     } finally {
       setLoading(false)
     }
   }
 
-  const updateChallenge = async (challengeId: number) => {
+  
+
+  const updateChallenge = async (challengeId: number, correctAnswer: boolean) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/updateChallenge`, {
+      const authToken = await handleAction('verify', {})
+      if (!authToken) {
+        console.error('Failed to get auth token')
+        return
+      }
+      
+      // Deduct entry fee for playing the game
+      await fetch(`${BACKEND_URL}/useEntry`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': await handleAction('verify', {})
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
           user: session.actor,
-          challengeId
+          entryAmount: 1
         })
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error);
+      // If answer is correct, update the challenge for chall
+      if (correctAnswer) {
+        const response = await fetch(`${BACKEND_URL}/updateChallenge`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            user: session.actor,
+            challengeId
+          })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error);
+        }
+      } else {
+        setModalMessage('Answer incorrect')
+        setIsModalOpen(true)
       }
     } catch (err: any) {
       setError(err.message);
@@ -134,7 +165,7 @@ export default function GameActions({ session }) {
         data: {
           from: session.actor,
           to: 'sentnlagents',
-          quantity: '1.00000000 WAX',
+          quantity: '10.00000000 WAX',
           memo: 'Ticket purchase'
         }
       };
@@ -159,16 +190,13 @@ export default function GameActions({ session }) {
   return (
     <div className="space-y-4 p-4">
       <div className="space-y-2">
-        <h3 className="text-lg font-bold">Challenges</h3>
-        {[1, 2, 3].map((id) => (
-          <button
-            key={id}
-            onClick={() => updateChallenge(id)}
-            className="block w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          >
-            Complete Challenge {id}
-          </button>
-        ))}
+        <h3 className="text-lg font-bold">Ask </h3>
+        <button
+          onClick={() => updateChallenge(3, false)}
+          className="block w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Ask Question
+        </button>
       </div>
 
       <div className="space-y-2">
@@ -196,6 +224,7 @@ export default function GameActions({ session }) {
 
       {loading && <p className="text-blue-500">Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} message={modalMessage} />
     </div>
   )
 } 

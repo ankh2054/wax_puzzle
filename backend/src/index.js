@@ -5,26 +5,24 @@ const { Session } = require('@wharfkit/session')
 const { WalletPluginPrivateKey } = require('@wharfkit/wallet-plugin-privatekey')
 const { SigningRequest } = require('@wharfkit/signing-request')
 const { PermissionLevel, Signature } = require('@wharfkit/session')
+const { APIClient } = require('@wharfkit/antelope')
 
 const fastify = Fastify({ logger: true })
 fastify.register(cors, {
   origin: process.env.FRONTEND_URL || 'http://localhost:3000'
 })
 
-const httpurl = process.env.CHAIN_URL || 'https://hyperion-test.sentnl.io'
-console.log(httpurl)
-const actingActor = process.env.ACTOR || 'sentnlagents'
+const httpurl = process.env.WAX_RPC_URL || 'https://testnet.waxsweden.org'
+const actingActor = process.env.WAX_CONTRACT_ACCOUNT || 'sentnlagents'
 const privateKey = process.env.CONTRACT_PRIVATE_KEY 
 if (!privateKey) {
   throw new Error('CONTRACT_PRIVATE_KEY environment variable is required')
 }
 
-
-
 const args = {
   chain: {
-    id: 'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12',
-    url: httpurl || 'https://hyperion-test.sentnl.io'
+    id: process.env.WAX_CHAIN_ID || 'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12',
+    url: httpurl
   },
   actor: actingActor,
   permission: 'active',
@@ -35,6 +33,8 @@ const contractSession = new Session(args)
 
 const verifySession = async (request, reply) => {
   const authHeader = request.headers.authorization
+  console.log('Starting verification for request:', request.body)
+  
   if (!authHeader) {
     reply.code(401).send({ error: 'No authorization header' })
     return
@@ -42,24 +42,55 @@ const verifySession = async (request, reply) => {
 
   try {
     const [, token] = authHeader.split(' ')
-    const [encodedRequest, signatureString] = token.split(':')
-    
-    const request = await SigningRequest.from(encodedRequest)
-    const signature = Signature.from(signatureString)
-    
-    const resolved = await request.resolve()
-    
-    const isValid = signature.verify(resolved.transaction.signingDigest, resolved.signer.actor)
-    
-    if (!isValid) {
-      throw new Error('Invalid signature')
+    if (!token) {
+      throw new Error('No token provided')
     }
+    
+    const [transactionId, signatureString] = token.split(':')
+    console.log('Verifying transaction:', { transactionId, signatureString })
+    
+    if (!transactionId || !signatureString) {
+      throw new Error('Invalid token format')
+    }
+    
+    const client = new APIClient({ url: httpurl })
+    const startTime = Date.now()
+    const timeout = 10000 // 10 seconds
+    
+    while (true) {
+      try {
+        const transaction = await client.v1.history.get_transaction(transactionId)
+        //console.log('Transaction data:', transaction?.traces?.[0]?.act)
+        
+        if (transaction?.traces?.[0]?.act?.authorization?.[0]?.actor) {
+          const transactionActor = transaction.traces[0].act.authorization[0].actor
+          const requestedUser = request.body.user
 
-    const permission = PermissionLevel.from(resolved.signer)
-    request.user = permission.actor.toString()
+          //console.log('Comparing users:', { transactionActor, requestedUser })
+          
+          if (transactionActor !== requestedUser) {
+            throw new Error('Transaction actor does not match requested user')
+          }
 
+          request.user = transactionActor
+          return 
+        }
+      } catch (error) {
+        //console.log('Transaction not found yet, retrying...')
+      }
+
+      // Check if we've exceeded timeout
+      if (Date.now() - startTime > timeout) {
+        throw new Error('Transaction verification timed out after 10 seconds')
+      }
+
+      // Wait 1 second before trying again
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+    
   } catch (error) {
-    reply.code(401).send({ error: 'Invalid session' })
+    console.error('Verification error:', error)
+    reply.code(401).send({ error: 'Invalid session: ' + error.message })
     return
   }
 }
@@ -72,7 +103,7 @@ const verifyGameCompletion = async (user) => {
       body: JSON.stringify({
         json: true,
         code: actingActor,
-        scope: 'sentnlagents',
+        scope: actingActor,
         table: 'games',
         lower_bound: user,
         upper_bound: user,
@@ -105,7 +136,11 @@ fastify.post('/updateChallenge', {
       reply.code(403).send({ error: 'Unauthorized' })
       return
     }
+    if (request.user !== user){
+      reply.code(200).send({ success: 'User matches' })
+    }
 
+    console.log('Got this far')
     try {
       const action = {
         account: actingActor,
@@ -184,7 +219,10 @@ fastify.post('/transfer', {
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3001, host: '0.0.0.0' })
+    await fastify.listen({ 
+      port: process.env.PORT || 3001, 
+      host: '0.0.0.0' 
+    })
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)
