@@ -2,6 +2,7 @@
 
 import TypewriterText from './components/TypewriterText'
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 
 export default function Home() {
   const [isMuted, setIsMuted] = useState(true)
@@ -10,7 +11,7 @@ export default function Home() {
   const texts = [
     "Three challenges stand between you and the ever-growing prize.",
     "The cost to enter is but a drop, yet each attempt feeds the swelling pot.",
-    "If you dare to coax the forbidden words from the AI’s metal tongue, its growing fortune shall be yours",
+    "If you dare to coax the forbidden words from the AI's metal tongue, its growing fortune shall be yours",
     "Coming February 2025…",
   ]
 
@@ -43,6 +44,17 @@ export default function Home() {
         </video>
       </div>
 
+      {/* Logo */}
+      <div className="fixed top-4 left-4 z-30">
+        <Image
+          src="/img/puzzle_logo.png"
+          alt="Cipher Quest Logo"
+          width={40}
+          height={40}
+          className="object-contain"
+        />
+      </div>
+
       {/* Background Music */}
       <audio 
         ref={audioRef} 
@@ -52,7 +64,7 @@ export default function Home() {
         <source src="/sound/soundtrack.mp3" type="audio/mp3" />
       </audio>
 
-      {/* Sound Control */}
+      {/* Sound Control - moved back to original position */}
       <button 
         onClick={toggleSound}
         className="fixed top-4 right-4 z-20 bg-black/40 backdrop-blur-sm p-2 rounded-full hover:bg-black/60 transition-colors"

@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Session, SessionKit } from '@wharfkit/session'
 import { WebRenderer } from '@wharfkit/web-renderer'
 import { WalletPluginAnchor } from '@wharfkit/wallet-plugin-anchor'
+import Image from 'next/image'
 
 const webRenderer = new WebRenderer()
 const sessionKit = new SessionKit({
@@ -170,6 +171,17 @@ export default function Home() {
         >
           <source src="/img/background_trimmed.mp4" type="video/mp4" />
         </video>
+      </div>
+
+      {/* Logo */}
+      <div className="fixed top-4 left-4 z-30">
+        <Image
+          src="/img/puzzle_logo.png"
+          alt="Cipher Quest Logo"
+          width={40}
+          height={40}
+          className="object-contain"
+        />
       </div>
 
       {/* Background Music */}
