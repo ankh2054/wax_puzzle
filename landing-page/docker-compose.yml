@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  landing-page:
+    build: .
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - VIRTUAL_HOST=www.cypherquest.ai
+      - LETSENCRYPT_HOST=www.cypherquest.ai
+      - LETSENCRYPT_EMAIL=charles.holtzkampf@gmail.com
+    networks:
+      - sentnl-net
+
+networks:
+  sentnl-net:
+    external: true 
