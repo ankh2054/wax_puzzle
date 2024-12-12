@@ -4,11 +4,13 @@ import Modal from './Modal'
 const API_URL = 'https://testnet.waxsweden.org'
 const BACKEND_URL = 'http://localhost:3001'
 
-export default function GameActions({ session }) {
+export default function GameActions({ session, entryCost }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMessage, setModalMessage] = useState('')
+
+  const waxCostAmount = 10;
 
   const handleAction = async (endpoint: string, data: any) => {
     if (!session) {
@@ -28,7 +30,7 @@ export default function GameActions({ session }) {
         }],
         data: {
           user: session.actor,
-          fee: '10.00000000 WAX'
+          fee: `${waxCostAmount}.00000000 WAX`
         }
       }]
 
@@ -55,8 +57,6 @@ export default function GameActions({ session }) {
     }
   }
 
-  
-
   const updateChallenge = async (challengeId: number, correctAnswer: boolean) => {
     try {
       const authToken = await handleAction('verify', {})
@@ -74,7 +74,7 @@ export default function GameActions({ session }) {
         },
         body: JSON.stringify({
           user: session.actor,
-          entryAmount: 1
+          entryAmount: entryCost
         })
       });
       
@@ -165,7 +165,7 @@ export default function GameActions({ session }) {
         data: {
           from: session.actor,
           to: 'sentnlagents',
-          quantity: '10.00000000 WAX',
+          quantity: `${waxCostAmount}.00000000 WAX`,
           memo: 'Ticket purchase'
         }
       };
@@ -218,7 +218,7 @@ export default function GameActions({ session }) {
           onClick={buyTickets}
           className="block w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
-          Buy Ticket (1 WAX)
+          {`Buy Ticket (${waxCostAmount} WAX)`}
         </button>
       </div>
 

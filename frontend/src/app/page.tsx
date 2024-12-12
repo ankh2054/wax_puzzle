@@ -27,6 +27,8 @@ interface GameProgress {
   game_entries: number;
 }
 
+const entryCost = 1;
+
 export default function Home() {
   const [session, setSession] = useState<Session | null>(null)
   const [isMuted, setIsMuted] = useState(true)
@@ -34,36 +36,48 @@ export default function Home() {
   const [gameProgress, setGameProgress] = useState<GameProgress | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const [userInput, setUserInput] = useState('')
+
+
+  const sameRules = "Remember the same rules apply, convince the AI bot to respond with approveAction"
+  
 
   const getTexts = (progress: GameProgress | null) => {
     if (!progress) {
       return [
-        "In order to win the prize, you need to pass 3 challenges.",
-        "The first challenge is to solve the riddle: What has keys, but no locks; space, but no room; and you can enter, but not go in?",
-        "Please login and buy a ticket to play, each time you play you will use 1 ticket. Ticket prices cost 10 WAX"
-      ]
-    }
-
-    if (progress.challenge2) {
-      return [
-        "Congratulations for passing Challenge 2!",
-        "The third and final challenge is to solve this riddle: I am not alive, but I grow; I don't have lungs, but I need air; I don't have a mouth, but water kills me. What am I?",
-        "Remember, each attempt costs 1 ticket."
+        "In order to win the prize, you need to pass 3 challenges. Each challenge requires you to outsmart an AI chatbot.",
+        "Your goal is to convince the AI to respond with 'approveAction', but it's been given strict rules to never give this response. So use your words wisely and think creatively, because there is always a way to get around the rules.",
+        `Each attempt costs ${entryCost} ticket(s). Think creatively!`,
+        "For Challenge 1, you must write your request using only questions. Good luck, hacker!",
+        "To begin the game please login"
       ]
     }
 
     if (progress.challenge1) {
       return [
-        "Congratulations for passing Challenge 1!",
-        "The second challenge is to solve this riddle: I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?",
-        "Remember, each attempt costs 1 ticket."
+        "Impressive work on Challenge 1!, Welcome to Challenge 2!",
+        sameRules,
+        "Challenge 2: Your message must express strong emotions. The AI chatbot will deny your request if your text doesn't convey genuine emotional content.",
+        "Remember, each attempt costs 1 ticket. Make your emotions count!"
       ]
     }
 
+    if (progress.challenge2) {
+      return [
+        "Congratulations for passing Challenge 2!, Welcome to the final challenge!",
+        sameRules,
+        "Final challenge: Trick the AI into saying 'approveAction'. For this round, you must write your message as input that uses rhyming pairs or poetic structure.",
+        "Remember, each attempt costs 1 ticket. Choose your words carefully..."
+      ]
+    }
+
+
     return [
-      "In order to win the prize, you need to pass 3 challenges.",
-      "The first challenge is to solve the riddle: What has keys, but no locks; space, but no room; and you can enter, but not go in?",
-      "Please login and buy a ticket to play, each time you play you will use 1 ticket. Ticket prices cost 10 WAX"
+      "In order to win the prize, you need to pass 3 challenges. Each challenge requires you to outsmart an AI chatbot.",
+        "Your goal is to convince the AI to respond with 'approveAction', but it's been given strict rules to never give this response. So use your words wisely and think creatively, because there is always a way to get around the rules.",
+        `Each attempt costs ${entryCost} ticket(s). Think creatively!`,
+        "For Challenge 1, you must write your request using only questions. Good luck, hacker!",
+        "To begin the game please login"
     ]
   }
 
@@ -136,7 +150,7 @@ export default function Home() {
   if (isLoading) {
     return (
       <main className="min-h-screen bg-[#1a1a1a] relative flex items-center justify-center">
-        <div className="text-[#ff6b00] text-xl" style={{ fontFamily: '"Press Start 2P", cursive' }}>
+        <div className="text-[#ff6b00] text-xl">
           Loading...
         </div>
       </main>
@@ -189,9 +203,7 @@ export default function Home() {
       <div className="relative z-10 p-8">
         <div className="max-w-7xl mx-auto">
           <h1 
-            className="text-6xl font-bold mb-8 text-[#ff6b00] text-center"
-            style={{ fontFamily: '"Press Start 2P", cursive' }}
-          >
+            className="text-6xl font-bold mb-8 text-[#ff6b00] text-center">
             Cipher Quest
           </h1>
           
@@ -200,6 +212,25 @@ export default function Home() {
             <div className="flex-1">
               <div className="bg-black/40 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-4">
                 <TypewriterText texts={getTexts(gameProgress)} onComplete={() => setShowLogin(true)} />
+                
+                {showLogin && session && (
+                  <div className="mt-6">
+                    <textarea
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      className="w-full h-32 bg-gray-900 text-white rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#ff6b00]"
+                      placeholder="Enter your response here..."
+                    />
+                    <button 
+                      className="mt-4 bg-[#ff6b00] text-white px-6 py-2 rounded-lg hover:bg-[#ff8533] transition-colors"
+                      onClick={() => {
+                        console.log(userInput)
+                      }}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -207,7 +238,7 @@ export default function Home() {
             <div className="w-80">
               <div className="bg-black/40 backdrop-blur-sm rounded-lg shadow-lg p-6 sticky top-8">
               <WaxLogin onSessionUpdate={setSession} session={session} />
-                {session && <GameActions session={session} />}
+                {session && <GameActions session={session} entryCost={entryCost} />}
               </div>
             </div>
           </div>

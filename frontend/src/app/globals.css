@@ -32,8 +32,21 @@
   }
 }
 
+/* Default font for body text */
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans);
+}
+
+/* Apply Press Start 2P to headings and specific elements */
+h1, h2, h3, h4, h5, h6,
+button,
+.pixel-font {
+  font-family: "Press Start 2P", cursive;
+}
+
+/* Add a utility class for normal text */
+.normal-text {
+  font-family: var(--font-geist-sans);
 }
