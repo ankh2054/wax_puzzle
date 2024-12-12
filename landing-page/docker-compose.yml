@@ -8,8 +8,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - VIRTUAL_HOST=www.cypherquest.ai
-      - LETSENCRYPT_HOST=www.cypherquest.ai
+      - VIRTUAL_HOST=www.cypherquest.ai,cypherquest.ai
+      - LETSENCRYPT_HOST=www.cypherquest.ai,cypherquest.ai
       - LETSENCRYPT_EMAIL=charles.holtzkampf@gmail.com
     networks:
       - sentnl-net
