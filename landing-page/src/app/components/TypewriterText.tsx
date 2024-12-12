@@ -14,16 +14,22 @@ export default function TypewriterText({ texts, onComplete }: TypewriterTextProp
   const [isTyping, setIsTyping] = useState(true)
   const [showPrompt, setShowPrompt] = useState(false)
 
+  const handleContinue = () => {
+    if (!isTyping && currentTextIndex < texts.length - 1) {
+      setDisplayedTexts([...displayedTexts, texts[currentTextIndex]])
+      setCurrentTextIndex(prev => prev + 1)
+      setCurrentTypingText('')
+      setIsTyping(true)
+      setShowPrompt(false)
+    }
+  }
+
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && !isTyping && currentTextIndex < texts.length - 1) {
+      if (event.key === 'Enter') {
         event.preventDefault()
         event.stopPropagation()
-        setDisplayedTexts([...displayedTexts, texts[currentTextIndex]])
-        setCurrentTextIndex(prev => prev + 1)
-        setCurrentTypingText('')
-        setIsTyping(true)
-        setShowPrompt(false)
+        handleContinue()
       }
     }
 
@@ -64,7 +70,12 @@ export default function TypewriterText({ texts, onComplete }: TypewriterTextProp
         <p className="mb-4 text-sm leading-8">{currentTypingText}</p>
       )}
       {showPrompt && (
-        <p className="text-sm leading-8 animate-pulse">Press Enter to continue...</p>
+        <button 
+          onClick={handleContinue}
+          className="text-sm leading-8 animate-pulse hover:text-white focus:text-white transition-colors cursor-pointer"
+        >
+          Press Enter or tap here to continue...
+        </button>
       )}
     </div>
   )

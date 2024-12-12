@@ -14,6 +14,21 @@ export default function TypewriterText({ texts, onComplete }: TypewriterTextProp
   const [isTypingComplete, setIsTypingComplete] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  const handleContinue = () => {
+    if (isTypingComplete) {
+      setDisplayedTexts(prev => [...prev, currentTypingText])
+      
+      if (currentTextIndex < texts.length - 1) {
+        setCurrentTextIndex(prev => prev + 1)
+        setCurrentTypingText('')
+        setIsTypingComplete(false)
+        setShowPrompt(false)
+      } else {
+        onComplete?.()
+      }
+    }
+  }
+
   useEffect(() => {
     const text = texts[currentTextIndex]
     if (currentTypingText.length < text.length) {
@@ -42,22 +57,15 @@ export default function TypewriterText({ texts, onComplete }: TypewriterTextProp
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && isTypingComplete) {
-        setDisplayedTexts(prev => [...prev, currentTypingText])
-        
-        if (currentTextIndex < texts.length - 1) {
-          setCurrentTextIndex(prev => prev + 1)
-          setCurrentTypingText('')
-          setIsTypingComplete(false)
-          setShowPrompt(false)
-        } else {
-          onComplete?.()
-        }
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        event.stopPropagation()
+        handleContinue()
       }
     }
 
-    window.addEventListener('keypress', handleKeyPress)
-    return () => window.removeEventListener('keypress', handleKeyPress)
+    window.addEventListener('keypress', handleKeyPress, true)
+    return () => window.removeEventListener('keypress', handleKeyPress, true)
   }, [isTypingComplete, currentTextIndex, texts, onComplete, currentTypingText])
 
   return (
@@ -83,12 +91,13 @@ export default function TypewriterText({ texts, onComplete }: TypewriterTextProp
         {showCursor && <span className="opacity-100">_</span>}
       </p>
       {showPrompt && (
-        <p 
-          className="text-[#ff6b00] text-xs mt-4 animate-pulse"
+        <button 
+          onClick={handleContinue}
+          className="text-[#ff6b00] text-xs mt-4 animate-pulse hover:text-white focus:text-white transition-colors cursor-pointer"
           style={{ fontFamily: '"Press Start 2P", cursive' }}
         >
-          Press ENTER to continue...
-        </p>
+          Press ENTER or tap here to continue...
+        </button>
       )}
     </div>
   )
