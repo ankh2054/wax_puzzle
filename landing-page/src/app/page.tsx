@@ -12,7 +12,7 @@ export default function Home() {
     "Three challenges stand between you and the ever-growing prize.",
     "The cost to enter is but a drop, yet each attempt feeds the swelling pot.",
     "If you dare to coax the forbidden words from the AI's metal tongue, its growing fortune shall be yours",
-    "Coming February 2025…",
+    "Launching in the first quarter of 2025…",
   ]
 
   // Update audio state when mute state changes
