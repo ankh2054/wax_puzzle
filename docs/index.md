@@ -71,8 +71,6 @@ There are exactly 3 challenges:
 
 ### Is there a time limit?
 - No time limit per attempt
-- The prize pool continues to grow while you think
-- You can return to the game at any time
 
 ### Are there any hints?
 - For Challenge 1: Think about indirect questions
