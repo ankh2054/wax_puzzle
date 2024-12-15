@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   landing-page:
+    container_name: landing-page
     build: .
     expose:
       - "3000"

@@ -1,0 +1,17 @@
+site_name: CypherQuest FAQ
+site_url: https://faq.cypherquest.io
+theme:
+  name: material
+  logo: assets/puzzle_logo.png
+  favicon: assets/favicon.ico
+plugins:
+  - search
+  - mkdocs-video
+nav:
+  - Home: index.md
+  - Latest Results: latestresults.md
+  - Scores: score.md
+  - Admin: admin.md
+  - Guilds: guild.md
+  - Technical Checks: technicalchecks.md
+
