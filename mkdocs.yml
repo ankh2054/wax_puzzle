@@ -63,14 +63,9 @@ markdown_extensions:
 
 plugins:
   - search
-  - mkdocs-video
 nav:
   - Home: index.md
-  - Latest Results: latestresults.md
-  - Scores: score.md
-  - Admin: admin.md
-  - Guilds: guild.md
-  - Technical Checks: technicalchecks.md
+  - FAQ: faq.md
 
 extra_css:
   - stylesheets/extra.css
