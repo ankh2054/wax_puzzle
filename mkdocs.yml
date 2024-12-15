@@ -72,3 +72,6 @@ nav:
   - Guilds: guild.md
   - Technical Checks: technicalchecks.md
 
+extra_css:
+  - stylesheets/extra.css
+
