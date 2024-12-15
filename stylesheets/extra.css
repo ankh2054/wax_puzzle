@@ -1,0 +1,30 @@
+.md-header {
+    background-image: url('../assets/header-bg.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Optional: make header taller */
+.md-header__inner {
+    padding: 0.8rem 0.2rem;
+}
+
+/* Optional: add overlay to make text more readable */
+.md-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+    z-index: 0;
+}
+
+/* Ensure header content stays above overlay */
+.md-header__button,
+.md-header__title,
+.md-header__source {
+    position: relative;
+    z-index: 1;
+}
