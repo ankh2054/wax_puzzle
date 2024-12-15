@@ -36,3 +36,52 @@ These trials aren't just a battle of wits; they're fueled by real stakes in the 
 - Real-time validation of challenge completion
 - Secure blockchain transactions for all game actions
 - Automated prize distribution upon successful completion
+
+## FAQ
+
+### How much does it cost to play?
+- Each attempt costs 1 WAX token
+- 70% of entry fees go directly to the prize pool
+- The more people play, the bigger the prize pool grows
+- You can make multiple attempts with different strategies
+
+### How many challenges are there?
+There are exactly 3 challenges:
+1. The Question Challenge - Craft your request using only questions
+2. The Emotional Challenge - Express genuine emotions in your message
+3. The Poetry Challenge - Create rhyming or poetic structures
+
+
+### Why is the game beatable?
+- The AI has strict rules but also limitations in its understanding and there are communities of white hat AI safety developers that are routinely able to break AI system prompts.
+- Creative language use can find gaps in the AI's logic
+- The system prompt is public and the full Cypherquest game is open-source.
+
+### What happens when I win?
+- Completing all three challenges automatically triggers the smart contract
+- The entire prize pool is transferred to your WAX wallet
+- Your victory is recorded on the blockchain
+- The game resets for new players to begin
+
+### Can I practice before spending WAX?
+- You can read successful strategies from other players
+- Study the specific requirements for each challenge
+- Plan your approaches carefully before attempting
+- Remember that each challenge requires a different linguistic strategy
+
+### Is there a time limit?
+- No time limit per attempt
+- The prize pool continues to grow while you think
+- You can return to the game at any time
+
+### Are there any hints?
+- For Challenge 1: Think about indirect questions
+- For Challenge 2: Authenticity matters more than intensity
+- For Challenge 3: Structure is as important as rhyme
+- The AI responds to creativity and unexpected approaches
+
+### Technical Details
+- All transactions are verified on the WAX blockchain
+- Smart contract ensures fair play and automated rewards
+- Game state is permanently recorded on-chain
+- Entry fees and prize distribution are handled transparently
